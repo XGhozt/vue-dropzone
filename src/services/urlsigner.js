@@ -1,11 +1,11 @@
 export default {
-  getSignedURL(file, config) {
+  getSignedURL: function(file, config) {
     let payload = {
       filePath: file.name,
       contentType: file.type
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise(function (resolve, reject) {
       var fd = new FormData();
       let request = new XMLHttpRequest(),
           signingURL = (typeof config.signingURL === "function") ?  config.signingURL(file) : config.signingURL;
@@ -24,29 +24,29 @@ export default {
       if (config.withCredentials === true) {
         request.withCredentials = true;
       }
-      Object.entries(config.headers || {}).forEach(([name, value]) => {
+      Object.entries(config.headers || {}).forEach(function (name, value) {
         request.setRequestHeader(name, value);
       });
       payload = Object.assign(payload, config.params || {});
-      Object.entries(payload).forEach(([name, value]) => {
+      Object.entries(payload).forEach(function (name, value) {
         fd.append(name, value);
       });
 
       request.send(fd);
     });
   },
-  sendFile(file, config, is_sending_s3) {
+  sendFile: function(file, config, is_sending_s3) {
     var handler = (is_sending_s3) ? this.setResponseHandler : this.sendS3Handler;
 
     return this.getSignedURL(file, config)
-      .then((response) => {return handler(response, file)})
-      .catch((error) => { return error; });
+      .then(function (response) {return handler(response, file)})
+      .catch(function (error) { return error; });
   },
-  setResponseHandler(response, file) {
+  setResponseHandler: function (response, file) {
     file.s3Signature = response.signature;
     file.s3Url = response.postEndpoint;
   },
-  sendS3Handler(response, file) {
+  sendS3Handler: function(response, file) {
     let fd = new FormData(),
       signature = response.signature;
 
@@ -54,20 +54,20 @@ export default {
       fd.append(key, signature[key]);
     });
     fd.append('file', file);
-    return new Promise((resolve, reject) => {
+    return new Promise(function (resolve, reject) {
       let request = new XMLHttpRequest();
       request.open('POST', response.postEndpoint);
       request.onload = function () {
         if (request.status == 201) {
           var s3Error = (new window.DOMParser()).parseFromString(request.response, "text/xml");
-          var successMsg = s3Error.firstChild.children[0].innerHTML;
+          var successMsg = s3Error.firstChild.firstChild.firstChild.textContent;
           resolve({
             'success': true,
             'message': successMsg
           })
         } else {
           var s3Error = (new window.DOMParser()).parseFromString(request.response, "text/xml");
-          var errMsg = s3Error.firstChild.children[0].innerHTML;
+          var errMsg = s3Error.firstChild.firstChild.firstChild.textContent;
           reject({
             'success': false,
             'message': errMsg + ". Request is marked as resolved when returns as status 201"
@@ -76,7 +76,7 @@ export default {
       };
       request.onerror = function (err) {
         var s3Error = (new window.DOMParser()).parseFromString(request.response, "text/xml");
-        var errMsg = s3Error.firstChild.children[1].innerHTML;
+        var errMsg = s3Error.firstChild.firstChild.firstChild.textContent
         reject({
           'success': false,
           'message': errMsg
