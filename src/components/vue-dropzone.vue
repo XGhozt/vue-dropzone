@@ -399,8 +399,9 @@ export default {
         promise.then(function (response) {
           if (response.success) {
             file.s3ObjectLocation = response.message;
+            var dz = this.dropzone
             setTimeout(function () {
-              this.dropzone.processFile(file)
+              dz.processFile(file)
             });
             this.$emit("vdropzone-s3-upload-success", response.message);
           } else {
@@ -413,13 +414,14 @@ export default {
               );
             }
           }
-        });
+        }.bind(this));
       } else {
         promise.then(function () {
+          var dz = this.dropzone
           setTimeout(function () {
-            this.dropzone.processFile(file)
+            dz.processFile(file)
           });
-        });
+        }.bind(this));
       }
       promise.catch(function (error) {
         alert(error);

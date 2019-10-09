@@ -24,11 +24,11 @@ export default {
       if (config.withCredentials === true) {
         request.withCredentials = true;
       }
-      Object.entries(config.headers || {}).forEach(function (name, value) {
+      Object.entries(config.headers || {}).forEach(function ([name, value]) {
         request.setRequestHeader(name, value);
       });
       payload = Object.assign(payload, config.params || {});
-      Object.entries(payload).forEach(function (name, value) {
+      Object.entries(payload).forEach(function ([name, value]) {
         fd.append(name, value);
       });
 
