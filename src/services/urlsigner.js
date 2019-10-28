@@ -29,7 +29,7 @@ export default {
       });
       payload = Object.assign(payload, config.params || {});
       Object.keys(payload).forEach(function (key) {
-        fd.append(key, config.headers[key]);
+        fd.append(key, payload[key]);
       });
 
       request.send(fd);
