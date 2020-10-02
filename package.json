@@ -43,7 +43,8 @@
     "vue-template-compiler": "^2.6.8",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.2.3",
-    "webpack-dev-server": "^3.2.1"
+    "webpack-dev-server": "^3.2.1",
+    "mime-types": "^2.1.27"
   },
   "scripts": {
     "build": "cross-env NODE_ENV=production rollup -c",

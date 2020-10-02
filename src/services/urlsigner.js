@@ -1,8 +1,16 @@
+var mime = require('mime-types')
+
 export default {
   getSignedURL: function(file, config) {
+    var fileType = file.type;
+
+    if (fileType == null || !fileType) {
+      fileType = mime.lookup( file.name )
+    }
+
     let payload = {
       filePath: file.name,
-      contentType: file.type
+      contentType: fileType
     }
 
     return new Promise(function (resolve, reject) {
